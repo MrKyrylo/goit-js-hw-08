@@ -68,43 +68,40 @@ const images = [
 
 const galleryContainer = document.querySelector('.gallery');
 
-  function createGalleryItem(image) {
-    const listItem = document.createElement('li');
-    listItem.classList.add('gallery-item');
+function createGalleryItem(image) {
+  return image
+    .map(
+      (item) => `
+  <li class="gallery-item">
+  <a class="gallery-link" href="${item.original}">
+    <img
+      class="gallery-image"
+      src="${item.preview}"
+      data-source="${item.original}"
+      alt="${item.description}"
+    />
+  </a>
+</li>
+  `
+    ) 
+    .join('');
+}
 
-    const link = document.createElement('a');
-    link.classList.add('gallery-link');
-    link.href = image.original;
+console.log(createGalleryItem(images));
 
-    const img = document.createElement('img');
-    img.classList.add('gallery-image');
-    img.src = image.preview;
-    img.setAttribute('data-source', image.original);
-    img.alt = image.description;
+galleryContainer.innerHTML = createGalleryItem(images);
 
-    link.appendChild(img);
-    listItem.appendChild(link);
 
-    return listItem;
-  }
+galleryContainer.addEventListener('click', openModal);
 
-  // Populate the gallery
-  images.forEach(image => {
-    const galleryItem = createGalleryItem(image);
-    galleryContainer.appendChild(galleryItem);
-  });
+function openModal(event) {
+  event.preventDefault();
+  if (event.target.nodeName !== 'IMG') return;
 
-  // Add click event listener for delegation
-  galleryContainer.addEventListener('click', openModal);
+  const source = event.target.dataset.source;
+  const instance = basicLightbox.create(`
+    <img src="${source}" width="800" height="600">
+  `);
 
-  function openModal(event) {
-    event.preventDefault();
-    if (event.target.nodeName !== 'IMG') return;
-
-    const source = event.target.dataset.source;
-    const instance = basicLightbox.create(`
-      <img src="${source}" width="800" height="600">
-    `);
-
-    instance.show();
-  }
+  instance.show();
+}
